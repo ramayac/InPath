@@ -1,0 +1,1 @@
+enum Estado { ESPERANDO, JUGANDO, MUERTO };
