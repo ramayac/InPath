@@ -16,13 +16,14 @@ color COL_PIEZA = #FF3333, COL_NAVE  = #FFFFFF,
 
 Pieza[] pieza = null;
 Nave nave = null;
+BotonPausa btnPausa = null;
 
 void setup() {
   size(320, 470);
   
   frameRate(40);
   smooth();
-  noCursor();
+  //noCursor();
   
   noiseDetail(3, 0.5);
   textAlign(CENTER, CENTER);
@@ -32,6 +33,7 @@ void setup() {
   ANCHO = width/4;
   nave = new Nave();
   pieza = new Pieza[PIEZAS];
+  btnPausa = new BotonPausa(0, 0);
 
   estado = Estado.ESPERANDO;
 
@@ -54,9 +56,13 @@ void draw() {
   }
 
   nave.draw();
-
+  btnPausa.draw();
+  
+  if (estado == Estado.PAUSA) {
+    textt("Paused", width/2, height/10);
+    textt("Touch to continue",  width/2, height/10+FONTSIZE);
   //Actualizar las piezas
-  if (estado == Estado.ESPERANDO) {
+  } else if (estado == Estado.ESPERANDO) {
     textt("Keep in path", width/2, height/10);
     textt("Touch to start",  width/2, height/10+FONTSIZE);
     //nave.move(width/2);
@@ -125,24 +131,36 @@ void resetGame(){
   }
 }
 
-void mouseClicked(){
-  if (estado == Estado.JUGANDO) {
+/*void mouseClicked(){
+  if (btnPausa.clicked()){
+    estado = Estado.PAUSA;
+  } else if (estado == Estado.JUGANDO) {
     return;
-  }
-  else if (estado == Estado.ESPERANDO) {
+  } else if (estado == Estado.ESPERANDO) {
     resetGame();
     estado = Estado.JUGANDO;
-  } 
-  else if (estado == Estado.MUERTO) {
+  } else if (estado == Estado.MUERTO) {
     estado = Estado.ESPERANDO;
   }
-}
+}*/
 
 //mouseMoved, mouseDragged
-void mouseMoved() {
-  if (estado == Estado.JUGANDO) {
-    nave.move(mouseX);
-  } 
+void mouseDragged() { 
+  if (btnPausa.clicked()){
+    estado = Estado.PAUSA;
+  } else if (estado == Estado.PAUSA) {
+    estado = Estado.JUGANDO;
+  } else if (estado == Estado.JUGANDO) {
+    if(nave.over()){
+      nave.move(mouseX);
+    }
+    return;
+  } else if (estado == Estado.ESPERANDO) {
+    resetGame();
+    estado = Estado.JUGANDO;
+  } else if (estado == Estado.MUERTO) {
+    estado = Estado.ESPERANDO;
+  }
 }
   /* else if (estado == Estado.ESPERANDO) {
     resetGame();
